@@ -1,21 +1,26 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
+import Loading from "../helper/Loading.jsx";
+import axiosInstance from "../../AxiosConfig.js";
 
 const ChangePassword = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
+    old_password: "",
+    new_password: "",
+    confirm_new_password: ""
   });
 
   const [errors, setErrors] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
+    old_password: "",
+    new_password: "",
+    confirm_new_password: ""
   });
 
   const [showPasswords, setShowPasswords] = useState({
-    current: false,
+    old: false,
     new: false,
     confirm: false
   });
@@ -54,11 +59,10 @@ const ChangePassword = () => {
       [name]: value
     }));
 
-    if (name === "newPassword") {
+    if (name === "new_password") {
       calculatePasswordStrength(value);
     }
 
-    // Clear errors when user starts typing
     setErrors(prev => ({
       ...prev,
       [name]: ""
@@ -76,21 +80,21 @@ const ChangePassword = () => {
     let isValid = true;
     const newErrors = {};
 
-    if (!formData.currentPassword) {
-      newErrors.currentPassword = "Current password is required";
+    if (!formData.old_password) {
+      newErrors.old_password = "Current password is required";
       isValid = false;
     }
 
-    if (!formData.newPassword) {
-      newErrors.newPassword = "New password is required";
+    if (!formData.new_password) {
+      newErrors.new_password = "New password is required";
       isValid = false;
     }
 
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your new password";
+    if (!formData.confirm_new_password) {
+      newErrors.confirm_new_password = "Please confirm your new password";
       isValid = false;
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+    } else if (formData.new_password !== formData.confirm_new_password) {
+      newErrors.confirm_new_password = "Passwords do not match";
       isValid = false;
     }
 
@@ -98,11 +102,18 @@ const ChangePassword = () => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Handle password change logic here
-      console.log("Form submitted:", formData);
+      try {
+        setLoading(true);
+        const response = await axiosInstance.post("/api/auth/password/change/", formData);
+        navigate("/");
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -117,7 +128,13 @@ const ChangePassword = () => {
     return colors[passwordStrength.score - 1] || "bg-gray-200";
   };
 
+  const navigateHome = () => {
+    navigate("/home");
+  }
+
   return (
+      <div className="relative">
+        {loading && <Loading />}
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div>
@@ -127,19 +144,18 @@ const ChangePassword = () => {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            {/* Current Password Field */}
             <div>
-              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-                Current Password
+              <label htmlFor="old_password" className="block text-sm font-medium text-gray-700">
+                Old Password
               </label>
               <div className="mt-1 relative">
                 <input
-                  id="currentPassword"
-                  name="currentPassword"
-                  type={showPasswords.current ? "text" : "password"}
-                  value={formData.currentPassword}
+                  id="old_password"
+                  name="old_password"
+                  type={showPasswords.old ? "text" : "password"}
+                  value={formData.old_password}
                   onChange={handleInputChange}
-                  className={`appearance-none block w-full px-3 py-2 border ${errors.currentPassword ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
+                  className={`appearance-none block w-full px-3 py-2 border ${errors.old_password ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                   placeholder="Enter current password"
                 />
                 <button
@@ -147,27 +163,27 @@ const ChangePassword = () => {
                   onClick={() => togglePasswordVisibility("current")}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
                 >
-                  {showPasswords.current ? <FaEyeSlash /> : <FaEye />}
+                  {showPasswords.old ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.currentPassword && (
-                <p className="mt-2 text-sm text-red-600">{errors.currentPassword}</p>
+              {errors.old_password && (
+                <p className="mt-2 text-sm text-red-600">{errors.old_password}</p>
               )}
             </div>
 
             {/* New Password Field */}
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="new_password" className="block text-sm font-medium text-gray-700">
                 New Password
               </label>
               <div className="mt-1 relative">
                 <input
-                  id="newPassword"
-                  name="newPassword"
+                  id="new_password"
+                  name="new_password"
                   type={showPasswords.new ? "text" : "password"}
-                  value={formData.newPassword}
+                  value={formData.new_password}
                   onChange={handleInputChange}
-                  className={`appearance-none block w-full px-3 py-2 border ${errors.newPassword ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
+                  className={`appearance-none block w-full px-3 py-2 border ${errors.new_password ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                   placeholder="Enter new password"
                 />
                 <button
@@ -178,10 +194,10 @@ const ChangePassword = () => {
                   {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.newPassword && (
-                <p className="mt-2 text-sm text-red-600">{errors.newPassword}</p>
+              {errors.new_password && (
+                <p className="mt-2 text-sm text-red-600">{errors.new_password}</p>
               )}
-              {formData.newPassword && (
+              {formData.new_password && (
                 <div className="mt-2">
                   <div className="h-2 rounded-full bg-gray-200">
                     <div
@@ -198,17 +214,17 @@ const ChangePassword = () => {
 
             {/* Confirm New Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirm_new_password" className="block text-sm font-medium text-gray-700">
                 Confirm New Password
               </label>
               <div className="mt-1 relative">
                 <input
-                  id="confirmPassword"
-                  name="confirmPassword"
+                  id="confirm_new_password"
+                  name="confirm_new_password"
                   type={showPasswords.confirm ? "text" : "password"}
-                  value={formData.confirmPassword}
+                  value={formData.confirm_new_password}
                   onChange={handleInputChange}
-                  className={`appearance-none block w-full px-3 py-2 border ${errors.confirmPassword ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
+                  className={`appearance-none block w-full px-3 py-2 border ${errors.confirm_new_password ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                   placeholder="Confirm new password"
                 />
                 <button
@@ -219,8 +235,8 @@ const ChangePassword = () => {
                   {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>
+              {errors.confirm_new_password && (
+                <p className="mt-2 text-sm text-red-600">{errors.confirm_new_password}</p>
               )}
             </div>
           </div>
@@ -233,9 +249,11 @@ const ChangePassword = () => {
               Change Password
             </button>
           </div>
+          <p className="text-center mt-2 text-sm text-blue-500 hover:text-blue-700 hover:cursor-pointer" onClick={navigateHome}>Back to home screen</p>
         </form>
       </div>
     </div>
+      </div>
   );
 };
 

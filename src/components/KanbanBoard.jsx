@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
-const KanbanBoard = ({darkMode}) => {
+const KanbanBoard = ({ darkMode, projectId }) => {
   const [projects, setProjects] = useState([
     {
       id: "1",
