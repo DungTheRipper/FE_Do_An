@@ -2,25 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
-const KanbanBoard = ({ darkMode, projectId }) => {
-  const [projects, setProjects] = useState([
-    {
-      id: "1",
-      name: "Project Alpha",
-      columns: [
-        { id: "col1", name: "a", color: "#3B82F6" },
-        { id: "col2", name: "b", color: "#10B981" },
-        { id: "col3", name: "c", color: "#6366F1" },
-        { id: "col4", name: "d", color: "#EF4444" }
-      ],
-      tasks: [
-        { id: "1", title: "Design UI Mockups", status: "pending", priority: "high", deadline: "2024-02-20", columnId: "col1" },
-        { id: "2", title: "Implement API Integration", status: "in progress", priority: "medium", deadline: "2024-02-25", columnId: "col2" }
-      ]
-    }
-  ]);
-
-  const [selectedProject, setSelectedProject] = useState("1");
+const OldKanbanBoard = ({ darkMode, projectId }) => {
   const [editingTask, setEditingTask] = useState(null);
   const [editingColumn, setEditingColumn] = useState(null);
   const [newTask, setNewTask] = useState({
@@ -504,4 +486,4 @@ const KanbanBoard = ({ darkMode, projectId }) => {
   );
 };
 
-export default KanbanBoard;
+export default OldKanbanBoard;
