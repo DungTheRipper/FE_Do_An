@@ -4,7 +4,7 @@ import Task from "./Task.jsx";
 const Column = ({darkMode, title, tasks, id}) => {
     return (
         <div
-            className={`column ${darkMode ? "bg-gray-700" : "bg-gray-100"} rounded-md min-w-[200px] min-h-screen flex-grow transition-colors duration-200`}>
+            className={`column ${darkMode ? "bg-gray-700" : "bg-gray-100"} rounded-md min-w-[200px] min-h-screen max-w-max flex-grow transition-colors duration-200`}>
             <h3 className={`sticky px-2 py-2 text-center font-bold text-xl rounded
             ${darkMode ? "text-gray-100 bg-gray-700" : "text-gray-800 bg-gray-100"} 
             transition-colors duration-200`}

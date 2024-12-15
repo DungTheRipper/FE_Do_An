@@ -16,7 +16,7 @@ const Task = ({darkMode, task, index}) => {
         <Draggable draggableId={task.id} index={index}>
             {(provided, snapshot) => (
                 <div
-                    className={`flex flex-col space-between cursor-pointer my-2.5 min-h-[90px] mb-2 rounded-lg p-2 shadow-md
+                    className={`flex flex-col space-between cursor-pointer my-2.5 max-w-full min-h-[90px] mb-2 rounded-lg p-2 shadow-md
                       ${darkMode ? `text-gray-100 ${priorityColorMap[task.priority]}` : `text-gray-600 ${priorityColorMap[task.priority]}`}
                       ${snapshot.isDragging && "bg-blue-300 text-gray-100"}
                       transition-all duration-200`}
