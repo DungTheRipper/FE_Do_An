@@ -2,7 +2,7 @@ import {Draggable} from "react-beautiful-dnd";
 import {useState} from "react";
 import TaskDetailsPopup from "../../helper/TaskDetailsPopup.jsx";
 
-const Task = ({darkMode, task, index}) => {
+const Task = ({darkMode, task, index, onTaskUpdated}) => {
     const [showDetailTaskPopup, setShowDetailTaskPopup] = useState(false);
 
     const formatDate = (dateString) => {
@@ -76,8 +76,11 @@ const Task = ({darkMode, task, index}) => {
             </Draggable>
 
             {showDetailTaskPopup && (
-                <TaskDetailsPopup darkMode={darkMode} task={task} isOverdue={isOverdue}
-                                  onClose={() => setShowDetailTaskPopup(false)}/>
+                <TaskDetailsPopup darkMode={darkMode} task={task}
+                                  isOverdue={isOverdue}
+                                  onClose={() => setShowDetailTaskPopup(false)}
+                                  onTaskUpdated={onTaskUpdated}
+                />
             )}
         </div>
     );

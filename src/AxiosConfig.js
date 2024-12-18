@@ -47,8 +47,7 @@ axiosInstance.interceptors.response.use(
                     localStorage.removeItem('access');
                     localStorage.removeItem('refresh');
 
-                    const navigate = useNavigate();
-                    navigate('/');
+                    window.location.href = '/;'
                 }
             }
         }

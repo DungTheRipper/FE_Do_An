@@ -1,7 +1,7 @@
 import {Droppable} from "react-beautiful-dnd";
 import Task from "./Task.jsx";
 
-const Column = ({darkMode, title, tasks, id}) => {
+const Column = ({darkMode, title, tasks, id, onTaskUpdated}) => {
     return (
         <div
             className={`column ${darkMode ? "bg-gray-700" : "bg-gray-100"}
@@ -25,7 +25,7 @@ const Column = ({darkMode, title, tasks, id}) => {
                         className={`${darkMode ? "text-gray-100 bg-gray-700" : "text-gray-600 bg-gray-100"} p-3 transition-colors duration-200 flex-grow min-h-[100px]`}
                     >
                         {tasks.map((task, index) => (
-                            <Task key={task.id} task={task} index={index} darkMode={darkMode}/>
+                            <Task key={task.id} task={task} index={index} darkMode={darkMode} onTaskUpdated={onTaskUpdated}/>
                         ))}
                         {provided.placeholder}
                     </div>

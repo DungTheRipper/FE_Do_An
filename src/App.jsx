@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 
 import Dashboard from './components/home/dashboard/Dashboard.jsx'
 import Nav from "./components/home/nav/Nav.jsx";
@@ -20,6 +20,18 @@ const WorkManagementApp = () => {
     };
 
     useEffect(() => {
+        const savedTab = localStorage.getItem("activeTab");
+        if (savedTab) {
+            setActiveTab(savedTab);
+        }
+    }, []);
+
+    const handleSetActiveTab = (tab) => {
+        setActiveTab(tab);
+        localStorage.setItem("activeTab", tab);
+    };
+
+    useEffect(() => {
         const getUserDetails = async () => {
             try {
                 setLoading(true);
@@ -32,21 +44,25 @@ const WorkManagementApp = () => {
             }
         }
         getUserDetails();
-    }, [])
+    }, []);
 
     return (
         <div className={`relative min-h-screen overflow-x-auto ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
-            {loading && <Loading/>}
-            <div
-                className={`min-h-screen flex transition-colors duration-200`}>
-                <Nav darkMode={darkMode} onSetDarkMode={toggleDarkMode} activeTab={activeTab}
-                     onSetActiveTab={setActiveTab} username={userData?.full_name}
-                     setSelectedProject={setSelectedProject}/>
+            {loading && <Loading />}
+            <div className={`min-h-screen flex transition-colors duration-200`}>
+                <Nav
+                    darkMode={darkMode}
+                    onSetDarkMode={toggleDarkMode}
+                    activeTab={activeTab}
+                    onSetActiveTab={handleSetActiveTab}
+                    username={userData?.full_name}
+                    setSelectedProject={setSelectedProject}
+                />
                 <main className="flex-1 p-6">
-                    {activeTab === "dashboard" && <Dashboard darkMode={darkMode}/>}
-                    {activeTab === "weekly-reports" && <WeeklyReports darkMode={darkMode}/>}
-                    {activeTab === "monthly-reports" && <MonthlyReports darkMode={darkMode}/>}
-                    {activeTab.startsWith("project_") && <KanbanBoard darkMode={darkMode} projectId={activeTab.split("_")[1]}/> }
+                    {activeTab === "dashboard" && <Dashboard darkMode={darkMode} />}
+                    {activeTab === "weekly-reports" && <WeeklyReports darkMode={darkMode} />}
+                    {activeTab === "monthly-reports" && <MonthlyReports darkMode={darkMode} />}
+                    {activeTab.startsWith("project_") && <KanbanBoard darkMode={darkMode} projectId={activeTab.split("_")[1]} />}
                 </main>
             </div>
         </div>

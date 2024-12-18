@@ -110,6 +110,7 @@ const KanbanBoard = ({ darkMode, projectId }) => {
                                     title={column.name}
                                     tasks={column.tasks}
                                     id={column.id}
+                                    onTaskUpdated={fetchColumns}
                                 />
                             ))}
                         </div>
