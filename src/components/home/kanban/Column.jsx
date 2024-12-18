@@ -4,14 +4,19 @@ import Task from "./Task.jsx";
 const Column = ({darkMode, title, tasks, id}) => {
     return (
         <div
-            className={`column ${darkMode ? "bg-gray-700" : "bg-gray-100"} rounded-md min-w-[200px] min-h-screen max-w-max flex-grow transition-colors duration-200`}>
-            <h3 className={`sticky px-2 py-2 text-center font-bold text-xl rounded
-            ${darkMode ? "text-gray-100 bg-gray-700" : "text-gray-800 bg-gray-100"} 
-            transition-colors duration-200`}
-                style={{userSelect: "none"}}
-            >
-                {title}
-            </h3>
+            className={`column ${darkMode ? "bg-gray-700" : "bg-gray-100"}
+                rounded-md min-w-[300px] max-w-[300px] min-h-[75vh] flex-shrink-0 overflow-hidden shadow-lg border border-gray-300`}
+        >
+            <div className="relative flex items-center justify-center px-2 py-2 border-b border-gray-300">
+                <h3
+                    className={`text-center font-bold text-xl truncate w-5/6 ${
+                        darkMode ? "text-gray-100" : "text-gray-800"
+                    }`}
+                    title={title}
+                >
+                    {title}
+                </h3>
+            </div>
             <Droppable droppableId={id}>
                 {(provided, snapshot) => (
                     <div

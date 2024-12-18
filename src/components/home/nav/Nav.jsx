@@ -88,9 +88,17 @@ const Nav = ({darkMode, onSetDarkMode, activeTab, onSetActiveTab, username, setS
                         >
                             <FaDashcube className="mr-2"/> Dashboard
                         </button>
-                        <ReportTreeMenu darkMode={darkMode} activeTab={activeTab} onSetActiveTab={onSetActiveTab}/>
-                        <ProjectTreeMenu darkMode={darkMode} projects={projects} activeTab={activeTab}
-                                         onSetActiveTab={onSetActiveTab} setSelectedProject={setSelectedProject}/>
+                        <ReportTreeMenu darkMode={darkMode}
+                                        activeTab={activeTab}
+                                        onSetActiveTab={onSetActiveTab}
+                        />
+                        <ProjectTreeMenu darkMode={darkMode}
+                                         projects={projects}
+                                         activeTab={activeTab}
+                                         onSetActiveTab={onSetActiveTab}
+                                         setSelectedProject={setSelectedProject}
+                                         setProjects={setProjects}
+                        />
                     </div>
                 </div>
             </nav>

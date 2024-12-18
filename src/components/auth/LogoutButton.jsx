@@ -2,8 +2,10 @@ import {FaSignOutAlt} from "react-icons/fa";
 import React, {useState} from "react";
 import axiosInstance from "../../AxiosConfig.js";
 import Loading from "../helper/Loading.jsx";
+import {useNavigate} from "react-router-dom";
 
 const LogoutButton = ({ darkMode }) => {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const refreshToken = localStorage.getItem("refresh");
     const handleLogout = async () => {
@@ -12,6 +14,9 @@ const LogoutButton = ({ darkMode }) => {
                 "refresh": refreshToken
             })
             setLoading(true);
+            localStorage.removeItem("access");
+            localStorage.removeItem("refresh");
+            navigate("/");
         } catch (error) {
             console.error(error);
         } finally {

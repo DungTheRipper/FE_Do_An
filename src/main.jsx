@@ -9,6 +9,7 @@ import ChangePassword from './components/auth/ChangePassword.jsx';
 
 import './index.css';
 import Callback from "./components/auth/Callback.jsx";
+import ResetPasswordConfirmation from "./components/auth/ResetPasswordConfirmation.jsx";
 
 const AuthContext = createContext(null);
 
@@ -40,6 +41,7 @@ createRoot(document.getElementById('root')).render(
             <Routes>
                 <Route path="/" element={<AuthScreen/>}/>
                 <Route path="/login/callback" element={<Callback/>}/>
+                <Route path="/reset-confirmation" element={<ResetPasswordConfirmation/>}/>
                 <Route
                     path="/home"
                     element={<PrivateRoute><App/></PrivateRoute>}
