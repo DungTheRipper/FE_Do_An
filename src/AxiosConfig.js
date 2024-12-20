@@ -46,6 +46,7 @@ axiosInstance.interceptors.response.use(
 
                     localStorage.removeItem('access');
                     localStorage.removeItem('refresh');
+                    localStorage.removeItem('activeTab');
 
                     window.location.href = '/;'
                 }

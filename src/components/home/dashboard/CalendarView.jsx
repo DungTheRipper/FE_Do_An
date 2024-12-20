@@ -58,7 +58,12 @@ const CalendarView = ({darkMode}) => {
                     ...onDeadlineTasksRes.data.data.tasks,
                     ...overdueTasksRes.data.data.tasks,
                 ];
-                setSelectedDateTask(data);
+
+                const uniqueTasks = data.filter((task, index, self) =>
+                    index === self.findIndex((t) => t.id === task.id)
+                );
+
+                setSelectedDateTask(uniqueTasks);
             } catch (error) {
                 console.error("Error fetching task data:", error);
             } finally {

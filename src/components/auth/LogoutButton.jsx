@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import axiosInstance from "../../AxiosConfig.js";
 import Loading from "../helper/Loading.jsx";
 import {useNavigate} from "react-router-dom";
+import NotificationManager from "../helper/NotificationManager.jsx";
 
 const LogoutButton = ({ darkMode }) => {
     const navigate = useNavigate();
@@ -10,12 +11,18 @@ const LogoutButton = ({ darkMode }) => {
     const refreshToken = localStorage.getItem("refresh");
     const handleLogout = async () => {
         try {
+            setLoading(true);
             await axiosInstance.post("/api/auth/logout/", {
                 "refresh": refreshToken
             })
-            setLoading(true);
+            NotificationManager.showNotification(
+                "Logout successfully",
+                "You have been logged out successfully!",
+                "info"
+            )
             localStorage.removeItem("access");
             localStorage.removeItem("refresh");
+            localStorage.removeItem("activeTab");
             navigate("/");
         } catch (error) {
             console.error(error);

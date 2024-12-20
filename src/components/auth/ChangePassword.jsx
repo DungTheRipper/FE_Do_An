@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
 import Loading from "../helper/Loading.jsx";
 import axiosInstance from "../../AxiosConfig.js";
+import NotificationManager from "../helper/NotificationManager.jsx";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -108,9 +109,19 @@ const ChangePassword = () => {
       try {
         setLoading(true);
         const response = await axiosInstance.post("/api/auth/password/change/", formData);
+        NotificationManager.showNotification(
+            "Change Password successfully",
+            "You have successfully changed your password.",
+            "success"
+        )
         navigate("/");
       } catch (error) {
         console.error(error);
+        NotificationManager.showNotification(
+            "Failed to change password",
+            "Something went wrong, please try again.",
+            "danger"
+        )
       } finally {
         setLoading(false);
       }

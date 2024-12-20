@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { FaProjectDiagram } from "react-icons/fa";
 import axiosInstance from "../../AxiosConfig.js";
 import Loading from "./Loading.jsx";
+import NotificationManager from "./NotificationManager.jsx";
 
 const ProjectPopup = ({
                           title,
@@ -43,19 +44,51 @@ const ProjectPopup = ({
 
         setLoading(true);
         try {
+            let title, message, projectName;
+            if (selectedProjectId) {
+                const response = await axiosInstance.get(`/api/tasks/project/${selectedProjectId}/`, {});
+                projectName = response.data.name;
+            }
             if (isDeleting) {
                 await axiosInstance.delete(`/api/tasks/project/${selectedProjectId}/`);
+                title = "Deleted project successfully";
+                message = `You deleted project ${projectName} successfully`;
             } else if (selectedProjectId) {
                 await axiosInstance.put(`/api/tasks/project/${selectedProjectId}/`, projectForm);
+                title = "Updated project successfully";
+                message = `You updated project ${projectForm.name} successfully`;
             } else {
                 await axiosInstance.post(`/api/tasks/project/`, projectForm);
+                title = "Created project successfully";
+                message = `You created project ${projectForm.name} successfully`;
             }
+
+            NotificationManager.showNotification(
+                `${title}`,
+                `${message}`,
+                "success",
+            )
 
             setProjects((prev) => [...prev]);
             onClose();
         } catch (error) {
             console.error("Error updating project:", error);
-            setErrors({ form: "An unexpected error occurred. Please try again." });
+            let title, message;
+            if (isDeleting) {
+                title = "Failed to delete project";
+                message = "An error occurred while deleting columns.";
+            } else if (selectedProjectId) {
+                title = "Failed to update project";
+                message = "An error occurred while updating columns.";
+            } else {
+                title = "Failed to create project";
+                message = "An error occurred while creating columns.";
+            }
+            NotificationManager.showNotification(
+                `${title}`,
+                `${message}`,
+                "danger",
+            )
         } finally {
             setLoading(false);
         }
@@ -95,7 +128,6 @@ const ProjectPopup = ({
                                     </div>
                                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                                 </div>
-                                {errors.form && <p className="text-red-500 text-sm mb-2">{errors.form}</p>}
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"

@@ -4,6 +4,7 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {FaGithub, FaGoogle} from "react-icons/fa";
 import Loading from "../helper/Loading.jsx";
+import NotificationManager from "../helper/NotificationManager.jsx";
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -48,9 +49,25 @@ const LoginForm = () => {
                 console.log("Login successful:", response.data);
                 localStorage.setItem("access", response.data.access);
                 localStorage.setItem("refresh", response.data.refresh);
+
+                NotificationManager.showNotification(
+                    "Login successfully",
+                    `Hello ${response.data.user.full_name}`,
+                    "success"
+                )
                 navigate("/home");
             } catch (error) {
                 console.error("Login failed:", error);
+                const errorMessage =
+                    error.response?.data?.error ||
+                    error.response?.data?.message ||
+                    "Đã có lỗi xảy ra. Vui lòng thử lại.";
+
+                NotificationManager.showNotification(
+                    "Login failed",
+                    `${errorMessage}`,
+                    "danger"
+                )
             } finally {
                 setLoading(false);
             }

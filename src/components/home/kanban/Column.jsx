@@ -22,7 +22,7 @@ const Column = ({darkMode, title, tasks, id, onTaskUpdated}) => {
                     <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`${darkMode ? "text-gray-100 bg-gray-700" : "text-gray-600 bg-gray-100"} p-3 transition-colors duration-200 flex-grow min-h-[100px]`}
+                        className={`${darkMode ? "text-gray-100 bg-gray-700" : "text-gray-600 bg-gray-100"} p-3 transition-colors duration-200 flex-grow min-h-[75vh]`}
                     >
                         {tasks.map((task, index) => (
                             <Task key={task.id} task={task} index={index} darkMode={darkMode} onTaskUpdated={onTaskUpdated}/>

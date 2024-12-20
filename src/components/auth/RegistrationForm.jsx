@@ -3,8 +3,9 @@ import {FiLock, FiMail, FiUser} from "react-icons/fi";
 import axios from "axios";
 import NotificationPopup from "../helper/NotificationPopup.jsx";
 import Loading from "../helper/Loading.jsx";
+import NotificationManager from "../helper/NotificationManager.jsx";
 
-const RegistrationForm = () => {
+const RegistrationForm = ({setIsLogin}) => {
     const [loading, setLoading] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [notificationsCode, setNotificationsCode] = useState("");
@@ -53,22 +54,42 @@ const RegistrationForm = () => {
         e.preventDefault();
         if (validateForm()) {
             try {
+                setLoading(true);
                 const response = await axios.post(
                     `${import.meta.env.VITE_BASE_URL}/api/auth/registration/`,
                     formData
                 );
                 console.log("Registration successful:", response.data);
-                setShowNotifications(true);
-                setRegistrationSuccess(true);
-                setNotificationsCode("REGISTER_SUCCESS");
-                setLoading(true);
-                setInterval(() => {
-                    window.location.reload();
-                }, 60000);
+
+                NotificationManager.showNotification(
+                    "Registration successful",
+                    "Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.",
+                    "success"
+                )
+
+                setFormData({
+                    first_name: "",
+                    last_name: "",
+                    email: "",
+                    password1: "",
+                    password2: "",
+                });
+
+                setIsLogin(true);
             } catch (error) {
                 console.error("Registration failed:", error);
-                setShowNotifications(true);
-                setNotificationsCode("ERROR");
+
+                const errorMessage =
+                    error.response?.data?.error ||
+                    error.response?.data?.message ||
+                    error.response?.data?.email?.error ||
+                    "Đã có lỗi xảy ra. Vui lòng thử lại.";
+
+                NotificationManager.showNotification(
+                    "Registration failed",
+                    `${errorMessage}`,
+                    "danger"
+                )
             } finally {
                 setLoading(false);
             }

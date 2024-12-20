@@ -14,7 +14,7 @@ const AuthScreen = () => {
                         {isLogin ? "Sign in to your account" : "Create your account"}
                     </h2>
                 </div>
-                {isLogin ? <LoginForm/> : <RegistrationForm/>}
+                {isLogin ? <LoginForm/> : <RegistrationForm setIsLogin={setIsLogin} />}
 
                 <div className="text-center">
                     <button

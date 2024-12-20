@@ -6,20 +6,38 @@ const NotificationPopup = ({ code, onClose }) => {
     console.log("NotificationPopup rendered with code:", code);
 
     const codeMessageMap = {
+        // Success
         "SUCCESS": "Operation was successful!",
+            //Register
         "REGISTER_SUCCESS": "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.",
+        // Error
         "ERROR": "Đã có lỗi xảy ra. Vui lòng thử lại!",
+            // Register
         "EMAIL_EXIST_ERROR": "Email này đã được sử dụng!",
-        "NOT_VERIFIED_EMAIL_LOGIN": "Email này chưa được xác thực. Vui lòng xác thực và thử lại!",
-        "LOGIN_WRONG_EMAIL_PASSWORD": "Email hoặc mật khẩu không đúng."
+            // Login
+        "LOGIN_EMPTY_FIELDS": "Yêu cầu nhập đầy đủ email và mật khẩu!",
+        "LOGIN_USER_NOT_FOUND": "Tài khoản không tồn tại!",
+        "LOGIN_WRONG_PASSWORD": "Mật khẩu không đúng!",
+        "LOGIN_INACTIVE_ACCOUNT": "Tài khoản này đã bị vô hiệu hóa!",
+        "LOGIN_UNVERIFIED_EMAIL": "Tài khoản chưa xác minh email."
     };
 
     const codeTitleMap = {
-        "SUCCESS": "Success",
-        "REGISTER_SUCCESS": "Success",
-        "ERROR": "Error",
-        "EMAIL_EXIST_ERROR": "Error"
-    }
+        // Success
+        "SUCCESS": "Thành công",
+            // Register
+        "REGISTER_SUCCESS": "Thành công",
+        // Error
+        "ERROR": "Lỗi",
+            // Register
+        "EMAIL_EXIST_ERROR": "Lỗi",
+            // Login
+        "LOGIN_EMPTY_FIELDS": "Lỗi",
+        "LOGIN_USER_NOT_FOUND": "Lỗi",
+        "LOGIN_WRONG_PASSWORD": "Lỗi",
+        "LOGIN_INACTIVE_ACCOUNT": "Lỗi",
+        "LOGIN_UNVERIFIED_EMAIL": "Lỗi"
+    };
 
     const message = codeMessageMap[code] || "No message available for this code.";
     const title = codeTitleMap[code] || "No title available for this code.";

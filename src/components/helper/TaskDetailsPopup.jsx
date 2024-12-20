@@ -1,12 +1,14 @@
 import {useState} from "react";
-import {IoMdClose} from "react-icons/io"; // Import icon close từ react-icons
+import {IoMdClose} from "react-icons/io";
 import Loading from "./Loading.jsx";
 import axiosInstance from "../../AxiosConfig.js";
+import NotificationManager from "./NotificationManager.jsx";
 
 const TaskDetailsPopup = ({darkMode, task, onClose, onTaskUpdated}) => {
     const [loading, setLoading] = useState(false);
     const [showExtendPopup, setShowExtendPopup] = useState(false);
     const [newDeadline, setNewDeadline] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const [formData, setFormData] = useState({
         title: task.title,
@@ -28,28 +30,43 @@ const TaskDetailsPopup = ({darkMode, task, onClose, onTaskUpdated}) => {
             await axiosInstance.patch(`/api/tasks/task/${task.id}/`, {
                 ...formData
             });
-            alert("Task updated successfully!");
+            NotificationManager.showNotification(
+                "Successfully updated task",
+                `The task "${formData.title}" was updated successfully.`,
+                "success"
+            )
             onTaskUpdated();
             onClose();
         } catch (error) {
             console.error("Error updating task:", error);
-            alert("Failed to update task.");
+            NotificationManager.showNotification(
+                "Failed to update task",
+                "An error occurred while updating task",
+                "danger"
+            )
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteTask = async () => {
-        if (!confirm("Are you sure you want to delete this task?")) return;
         try {
             setLoading(true);
             await axiosInstance.delete(`/api/tasks/task/${task.id}/`);
-            alert("Task deleted successfully!");
+            NotificationManager.showNotification(
+                "Task Deleted",
+                `The task "${task.title}" has been deleted successfully.`,
+                "success"
+            );
             onTaskUpdated();
             onClose();
         } catch (error) {
             console.error("Error deleting task:", error);
-            alert("Failed to delete task.");
+            NotificationManager.showNotification(
+                "Failed to Delete Task",
+                "An error occurred while deleting the task.",
+                "danger"
+            );
         } finally {
             setLoading(false);
         }
@@ -62,12 +79,20 @@ const TaskDetailsPopup = ({darkMode, task, onClose, onTaskUpdated}) => {
                 deadline: newDeadline,
                 status: 1,
             });
-            alert("Task extended successfully!");
+            NotificationManager.showNotification(
+                "Task Deleted",
+                `The task "${task.title}" has been extended successfully.`,
+                "success"
+            );
             onTaskUpdated();
             onClose();
         } catch (error) {
             console.error("Error extending task:", error);
-            alert("Failed to extend task.");
+            NotificationManager.showNotification(
+                "Failed to Extend Task",
+                "An error occurred while extending the task.",
+                "danger"
+            );
         } finally {
             setLoading(false);
         }
@@ -79,7 +104,11 @@ const TaskDetailsPopup = ({darkMode, task, onClose, onTaskUpdated}) => {
         const selectedDateTime = new Date(value);
 
         if (selectedDateTime < currentDateTime) {
-            alert("Deadline cannot be in the past, please select a valid time.");
+            NotificationManager.showNotification(
+                "Alert calendar",
+                `Deadline cannot be in the past, please select a valid time.`,
+                "warning"
+            );
             return;
         }
 
@@ -89,6 +118,28 @@ const TaskDetailsPopup = ({darkMode, task, onClose, onTaskUpdated}) => {
     return (
         <div className="relative">
             {loading && <Loading/>}
+            {showDeleteModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className={`p-6 rounded-lg ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
+                        <h2 className="text-xl font-semibold mb-4">Delete Task</h2>
+                        <p>Are you sure you want to delete the task "{task.title}"?</p>
+                        <div className="flex justify-end space-x-2 mt-4">
+                            <button
+                                onClick={() => setShowDeleteModal(false)}
+                                className="px-4 py-2 rounded border"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteTask}
+                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                 <div
                     className={`relative rounded-lg w-1/3 p-6 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}>
@@ -155,7 +206,7 @@ const TaskDetailsPopup = ({darkMode, task, onClose, onTaskUpdated}) => {
                         <div className="flex justify-end space-x-2">
                             <button
                                 type="button"
-                                onClick={handleDeleteTask}
+                                onClick={() => setShowDeleteModal(true)}
                                 className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
                             >
                                 Delete

@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import axiosInstance from "../../AxiosConfig.js";
+import NotificationManager from "./NotificationManager.jsx";
 
 const AddTaskPopup = ({darkMode, projectId, columns, onClose, onTaskAdded}) => {
     const [formData, setFormData] = useState({
@@ -11,7 +12,6 @@ const AddTaskPopup = ({darkMode, projectId, columns, onClose, onTaskAdded}) => {
         project: projectId || "",
         column: columns?.[0]?.id || "",
     });
-    const [error, setError] = useState(null);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -35,11 +35,20 @@ const AddTaskPopup = ({darkMode, projectId, columns, onClose, onTaskAdded}) => {
         e.preventDefault();
         try {
             await axiosInstance.post("/api/tasks/task/", formData);
+            NotificationManager.showNotification(
+                "Task added successfully",
+                `Task "${formData.title}" added successfully`,
+                "success"
+            )
             onTaskAdded();
             onClose();
         } catch (err) {
             console.error("Error creating task:", err);
-            setError("Failed to create task. Please try again.");
+            NotificationManager.showNotification(
+                "Failed to add task",
+                `Failed to create task. Please try again.`,
+                "danger"
+            )
         }
     };
 
@@ -52,7 +61,6 @@ const AddTaskPopup = ({darkMode, projectId, columns, onClose, onTaskAdded}) => {
                     } rounded-md w-1/2 p-6`}
                 >
                     <h2 className="text-2xl font-bold mb-4">Create Task</h2>
-                    {error && <p className="text-red-500 mb-4">{error}</p>}
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Title */}
                         <div>

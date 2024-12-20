@@ -3,6 +3,7 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import Loading from "./Loading.jsx";
 import axiosInstance from "../../AxiosConfig.js";
+import NotificationManager from "./NotificationManager.jsx";
 
 const ManageColumnsPopup = ({ currentColumns, projectId, onClose, onColumnsUpdated }) => {
     const [columns, setColumns] = useState([
@@ -30,7 +31,11 @@ const ManageColumnsPopup = ({ currentColumns, projectId, onClose, onColumnsUpdat
                 await axiosInstance.delete(`/api/tasks/column/${columnToRemove.id}/`);
             } catch (error) {
                 console.error("Error deleting column:", error);
-                setError("Failed to delete column.");
+                NotificationManager.showNotification(
+                    "Failed to delete columns.",
+                    "An error occurred while deleting columns.",
+                    "danger"
+                )
                 return;
             }
         }
@@ -102,7 +107,11 @@ const ManageColumnsPopup = ({ currentColumns, projectId, onClose, onColumnsUpdat
             onClose();
         } catch (error) {
             console.error("Error updating columns:", error);
-            setError("An error occurred while saving columns.");
+            NotificationManager.showNotification(
+                "Failed to save columns.",
+                "An error occurred while saving columns.",
+                "danger"
+            )
         } finally {
             setIsLoading(false);
         }

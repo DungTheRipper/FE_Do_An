@@ -4,12 +4,13 @@ import {BrowserRouter, Navigate, Outlet, Route, Routes} from 'react-router-dom';
 
 import App from './App.jsx';
 import AuthScreen from './components/auth/AuthScreen.jsx';
-import PasswordReset from './components/PasswordReset.jsx';
+import PasswordReset from './components/auth/PasswordReset.jsx';
 import ChangePassword from './components/auth/ChangePassword.jsx';
 
 import './index.css';
 import Callback from "./components/auth/Callback.jsx";
 import ResetPasswordConfirmation from "./components/auth/ResetPasswordConfirmation.jsx";
+import {ReactNotifications} from "react-notifications-component";
 
 const AuthContext = createContext(null);
 
@@ -37,6 +38,7 @@ const PrivateRoute = ({children}) => {
 
 createRoot(document.getElementById('root')).render(
     <BrowserRouter>
+        <ReactNotifications />
         <AuthProvider>
             <Routes>
                 <Route path="/" element={<AuthScreen/>}/>
