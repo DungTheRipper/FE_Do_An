@@ -47,8 +47,8 @@ const KanbanBoard = ({ darkMode, projectId }) => {
         fetchColumns();
     }, [projectId]);
 
-    const handleOnDragEnd = (result) => {
-        const { destination, source, draggableId } = result;
+    const handleOnDragEnd = async (result) => {
+        const {destination, source, draggableId} = result;
 
         if (!destination) return;
 
@@ -65,6 +65,15 @@ const KanbanBoard = ({ darkMode, projectId }) => {
         destinationColumn.tasks.splice(destination.index, 0, task);
 
         setColumns(updatedColumns);
+
+        try {
+            await axiosInstance.patch(`/api/tasks/task/${draggableId}/`, {
+                column: destinationColumn.id,
+                status: destinationColumn.is_done_column ? 2 : task.status === 2 ? 1 : task.status,
+            });
+        } catch (error) {
+            console.error("Error updating task:", error);
+        }
     };
 
     return (
