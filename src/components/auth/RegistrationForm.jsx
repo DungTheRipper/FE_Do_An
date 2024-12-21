@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {FiLock, FiMail, FiUser} from "react-icons/fi";
 import axios from "axios";
-import NotificationPopup from "../helper/NotificationPopup.jsx";
 import Loading from "../helper/Loading.jsx";
 import NotificationManager from "../helper/NotificationManager.jsx";
 

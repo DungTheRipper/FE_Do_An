@@ -44,7 +44,7 @@ const CalendarView = ({darkMode}) => {
 
     React.useEffect(() => {
         const fetchData = async (date) => {
-            const formattedDate = formatDateTime(date);
+            const formattedDate = formatDateTime(date, true);
             try {
                 setLoading(true);
                 const [allTasksRes, overdueTasksRes, onDeadlineTasksRes] = await Promise.all([
@@ -53,16 +53,25 @@ const CalendarView = ({darkMode}) => {
                     axiosInstance.get(`/api/tasks/on-deadline-tasks/?time=` + formattedDate),
                 ]);
 
-                const data = [
-                    ...allTasksRes.data.data.tasks,
-                    ...onDeadlineTasksRes.data.data.tasks,
-                    ...overdueTasksRes.data.data.tasks,
-                ];
+                const allTasks = allTasksRes.data.data.tasks.map(task => ({ ...task, type: 'all' }));
+                const overdueTasks = overdueTasksRes.data.data.tasks.map(task => ({ ...task, type: 'overdue' }));
+                const onDeadlineTasks = onDeadlineTasksRes.data.data.tasks.map(task => ({ ...task, type: 'on_deadline' }));
 
-                const uniqueTasks = data.filter((task, index, self) =>
-                    index === self.findIndex((t) => t.id === task.id)
-                );
+                const taskMap = new Map();
 
+                overdueTasks.forEach(task => taskMap.set(task.id, { ...task, color: 'red' }));
+                onDeadlineTasks.forEach(task => {
+                    if (!taskMap.has(task.id)) {
+                        taskMap.set(task.id, { ...task, color: 'yellow' });
+                    }
+                });
+                allTasks.forEach(task => {
+                    if (!taskMap.has(task.id)) {
+                        taskMap.set(task.id, { ...task, color: 'default' });
+                    }
+                });
+
+                const uniqueTasks = Array.from(taskMap.values());
                 setSelectedDateTask(uniqueTasks);
             } catch (error) {
                 console.error("Error fetching task data:", error);
@@ -74,29 +83,38 @@ const CalendarView = ({darkMode}) => {
         fetchData(selectedDate);
     }, [selectedDate]);
 
-    const getPriorityColor = (priority) => {
+    const getTitleColor = (color) => {
+        switch (color) {
+            case "red":
+                return "text-red-500"
+            case "yellow":
+                return "text-yellow-500"
+            case "default":
+                return darkMode ? "text-gray-200" : "text-gray-500"
+        }
+    }
+
+    const getPriorityImg = (priority) => {
         switch (priority) {
             case 1:
-                return darkMode ? "bg-yellow-800" : "bg-yellow-100";
+                return "/prio-low.svg";
             case 2:
-                return darkMode ? "bg-orange-800" : "bg-orange-100";
+                return "/prio-medium.svg";
             case 3:
-                return darkMode ? "bg-red-800" : "bg-red-100";
-            default:
-                return darkMode ? "bg-gray-800" : "bg-gray-100";
+                return "/prio-high.svg";
         }
-    };
+    }
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 1:
-                return darkMode ? "bg-green-800" : "bg-green-100";
-            case 2:
-                return darkMode ? "bg-green-800" : "bg-green-100";
-            case 3:
-                return darkMode ? "bg-red-800" : "bg-red-100";
+    const getTypeColor = (type) => {
+        switch (type) {
+            case "all":
+                return darkMode ? "bg-green-200 text-gray-500" : "bg-green-500 text-gray-100";
+            case "overdue":
+                return darkMode ? "bg-red-200 text-gray-500" : "bg-red-500 text-gray-100";
+            case "on_deadline":
+                return darkMode ? "bg-yellow-200 text-gray-500" : "bg-yellow-500 text-gray-100";
             default:
-                return darkMode ? "bg-gray-800" : "bg-gray-100";
+                return darkMode ? "bg-gray-200 text-gray-500" : "bg-gray-500 text-gray-100";
         }
     };
 
@@ -117,9 +135,11 @@ const CalendarView = ({darkMode}) => {
         setIsZoomed(false);
     };
 
-    const formatDateTime = (date) => {
-        const newDate = date ? date : new Date();
-        newDate.setHours(0, 0, 0, 0);
+    const formatDateTime = (date, resetHours = false) => {
+        const newDate = date ? new Date(date) : new Date();
+        if (resetHours) {
+            newDate.setHours(0, 0, 0, 0);
+        }
 
         const options = {
             timeZone: 'Asia/Ho_Chi_Minh',
@@ -133,13 +153,14 @@ const CalendarView = ({darkMode}) => {
         };
 
         const formatter = new Intl.DateTimeFormat('en-US', options);
-        const formattedDate = formatter.format(date);
+        const formattedDate = formatter.format(newDate);
 
         const [datePart, timePart] = formattedDate.split(', ');
         const [month, day, year] = datePart.split('/');
 
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} ${timePart}`;
-    }
+    };
+
 
     const formatDate = (date) => {
         const year = date.getFullYear();
@@ -237,7 +258,7 @@ const CalendarView = ({darkMode}) => {
                         </div>
                     </>
                 ) : (
-                    <div className="transition-all duration-300 ease-in-out transform">
+                    <div className="transition-colors duration-200 transform">
                         <button
                             onClick={handleBackClick}
                             className={`mb-4 flex items-center ${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-800"}`}
@@ -256,30 +277,35 @@ const CalendarView = ({darkMode}) => {
                             <table className="min-w-full table-auto">
                                 <thead>
                                 <tr className={darkMode ? "bg-gray-700" : "bg-gray-50"}>
-                                    <th className={`px-4 py-2 text-left text-sm font-semibold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Title</th>
-                                    <th className={`px-4 py-2 text-left text-sm font-semibold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Status</th>
-                                    <th className={`px-4 py-2 text-left text-sm font-semibold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Priority</th>
-                                    <th className={`px-4 py-2 text-left text-sm font-semibold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Deadline</th>
+                                    <th className={`px-4 py-2 text-left text-sm font-bold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Title</th>
+                                    <th className={`px-4 py-2 text-center text-sm font-bold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Status</th>
+                                    <th className={`px-4 py-2 text-center text-sm font-bold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Priority</th>
+                                    <th className={`px-4 py-2 text-center text-sm font-bold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Deadline</th>
+                                    <th className={`px-4 py-2 text-center text-sm font-bold ${darkMode ? "text-gray-200" : "text-gray-600"}`}>Project</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {selectedDateTask.map(task => (
                                     <tr key={task.id} className={darkMode ? "border-gray-700" : "border-b"}>
-                                        <td className="px-4 py-2">{task.title}</td>
-                                        <td className="px-4 py-2">
-                        <span className={`inline-block px-2 py-1 text-xs rounded-full ${getStatusColor(task.status)}`}>
-                          {task.status}
-                        </span>
+                                        <td className={`text-left font-semibold px-4 py-2 ${getTitleColor(task.color)}`}>{task.title}</td>
+                                        <td className="text-center font-semibold px-4 py-2">
+                                            <span className={`inline-block px-2 py-1 text-xs rounded-full ${getTypeColor(task.type)}`}>
+                                                {task.type === "all"
+                                                    ? "In Progress"
+                                                    : task.type === "on_deadline"
+                                                        ? "On Deadline"
+                                                        : "Overdue"}
+                                            </span>
                                         </td>
-                                        <td className="px-4 py-2">
-                        <span
-                            className={`inline-block px-2 py-1 text-xs rounded-full ${getPriorityColor(task.priority)}`}>
-                          {task.priority}
-                        </span>
+                                        <td className="text-center font-semibold px-4 py-2">
+                                            <img className={`inline-block px-2 py-1 text-xs rounded-full`}
+                                                 src={getPriorityImg(task.priority)}
+                                                alt={""} />
                                         </td>
-                                        <td className="px-4 py-2">
-                                            {new Date(task.deadline).toLocaleDateString()}
+                                        <td className={`text-center font-semibold px-4 py-2 ${new Date(task.deadline) < new Date() ? "text-red-500" : ""}`}>
+                                            {formatDateTime(new Date(task.deadline))}
                                         </td>
+                                        <td className="text-center font-semibold px-4 py-2">{task.project_name || "No Project"}</td>
                                     </tr>
                                 ))}
                                 </tbody>

@@ -1,20 +1,24 @@
-import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {FaEye, FaEyeSlash} from "react-icons/fa";
+import {useNavigate, useParams} from "react-router-dom";
 import Loading from "../helper/Loading.jsx";
-import axiosInstance from "../../AxiosConfig.js";
+import NotificationManager from "../helper/NotificationManager.jsx";
+import axios from "axios";
 
 const ResetPasswordConfirmation = () => {
     const navigate = useNavigate();
+    const {uidb64} = useParams();
+    const {token} = useParams();
+    const [disableInput, setDisableInput] = useState(false);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        new_password: "",
-        confirm_new_password: ""
+        password1: "",
+        password2: ""
     });
 
     const [errors, setErrors] = useState({
-        new_password: "",
-        confirm_new_password: ""
+        password1: "",
+        password2: ""
     });
 
     const [showPasswords, setShowPasswords] = useState({
@@ -26,6 +30,19 @@ const ResetPasswordConfirmation = () => {
         score: 0,
         message: ""
     });
+
+    useEffect(() => {
+        if (!uidb64 || !token) {
+            NotificationManager.showNotification(
+                "Invalid Request",
+                "Invalid or expired reset link.",
+                "danger"
+            );
+            setDisableInput(true);
+        } else {
+            setDisableInput(false);
+        }
+    }, [uidb64, token]);
 
     const calculatePasswordStrength = (password) => {
         let score = 0;
@@ -50,7 +67,7 @@ const ResetPasswordConfirmation = () => {
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -77,16 +94,16 @@ const ResetPasswordConfirmation = () => {
         let isValid = true;
         const newErrors = {};
 
-        if (!formData.new_password) {
-            newErrors.new_password = "New password is required";
+        if (!formData.password1) {
+            newErrors.password1 = "New password is required";
             isValid = false;
         }
 
-        if (!formData.confirm_new_password) {
-            newErrors.confirm_new_password = "Please confirm your new password";
+        if (!formData.password2) {
+            newErrors.password2 = "Please confirm your new password";
             isValid = false;
-        } else if (formData.new_password !== formData.confirm_new_password) {
-            newErrors.confirm_new_password = "Passwords do not match";
+        } else if (formData.password1 !== formData.password2) {
+            newErrors.password2 = "Passwords do not match";
             isValid = false;
         }
 
@@ -99,10 +116,20 @@ const ResetPasswordConfirmation = () => {
         if (validateForm()) {
             try {
                 setLoading(true);
-                const response = await axiosInstance.post("/api/auth/password/reset/", formData);
-                navigate("/login"); // Redirect to login after successful reset
+                const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/auth/password/reset/confirm/${uidb64}/${token}/`, formData);
+                NotificationManager.showNotification(
+                    "Reset password successfully",
+                    "Your password has been reset successfully",
+                    "success"
+                )
+                navigate("/");
             } catch (error) {
                 console.error(error);
+                NotificationManager.showNotification(
+                    "Reset password failed",
+                    "Oops! Something went wrong!",
+                    "danger"
+                )
             } finally {
                 setLoading(false);
             }
@@ -122,7 +149,7 @@ const ResetPasswordConfirmation = () => {
 
     return (
         <div className="relative">
-            {loading && <Loading />}
+            {loading && <Loading/>}
             <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12">
                 <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
                     <div>
@@ -134,36 +161,37 @@ const ResetPasswordConfirmation = () => {
                         <div className="space-y-4">
                             {/* New Password Field */}
                             <div>
-                                <label htmlFor="new_password" className="block text-sm font-medium text-gray-700">
+                                <label htmlFor="password1" className="block text-sm font-medium text-gray-700">
                                     New Password
                                 </label>
                                 <div className="mt-1 relative">
                                     <input
-                                        id="new_password"
-                                        name="new_password"
+                                        id="password1"
+                                        name="password1"
                                         type={showPasswords.new ? "text" : "password"}
-                                        value={formData.new_password}
+                                        value={formData.password1}
                                         onChange={handleInputChange}
-                                        className={`appearance-none block w-full px-3 py-2 border ${errors.new_password ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
+                                        className={`appearance-none block w-full px-3 py-2 border ${errors.password1 ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                                         placeholder="Enter new password"
+                                        disabled={disableInput}
                                     />
                                     <button
                                         type="button"
                                         onClick={() => togglePasswordVisibility("new")}
                                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
                                     >
-                                        {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
+                                        {showPasswords.new ? <FaEyeSlash/> : <FaEye/>}
                                     </button>
                                 </div>
-                                {errors.new_password && (
-                                    <p className="mt-2 text-sm text-red-600">{errors.new_password}</p>
+                                {errors.password1 && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.password1}</p>
                                 )}
-                                {formData.new_password && (
+                                {formData.password1 && (
                                     <div className="mt-2">
                                         <div className="h-2 rounded-full bg-gray-200">
                                             <div
                                                 className={`h-full rounded-full ${getStrengthColor()}`}
-                                                style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                                                style={{width: `${(passwordStrength.score / 5) * 100}%`}}
                                             ></div>
                                         </div>
                                         <p className="mt-1 text-sm text-gray-500">
@@ -175,29 +203,30 @@ const ResetPasswordConfirmation = () => {
 
                             {/* Confirm New Password Field */}
                             <div>
-                                <label htmlFor="confirm_new_password" className="block text-sm font-medium text-gray-700">
+                                <label htmlFor="password2" className="block text-sm font-medium text-gray-700">
                                     Confirm New Password
                                 </label>
                                 <div className="mt-1 relative">
                                     <input
-                                        id="confirm_new_password"
-                                        name="confirm_new_password"
+                                        id="password2"
+                                        name="password2"
                                         type={showPasswords.confirm ? "text" : "password"}
-                                        value={formData.confirm_new_password}
+                                        value={formData.password2}
                                         onChange={handleInputChange}
-                                        className={`appearance-none block w-full px-3 py-2 border ${errors.confirm_new_password ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
+                                        className={`appearance-none block w-full px-3 py-2 border ${errors.password2 ? "border-red-300" : "border-gray-300"} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
                                         placeholder="Confirm new password"
+                                        disabled={disableInput}
                                     />
                                     <button
                                         type="button"
                                         onClick={() => togglePasswordVisibility("confirm")}
                                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
                                     >
-                                        {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
+                                        {showPasswords.confirm ? <FaEyeSlash/> : <FaEye/>}
                                     </button>
                                 </div>
-                                {errors.confirm_new_password && (
-                                    <p className="mt-2 text-sm text-red-600">{errors.confirm_new_password}</p>
+                                {errors.password2 && (
+                                    <p className="mt-2 text-sm text-red-600">{errors.password2}</p>
                                 )}
                             </div>
                         </div>
@@ -210,7 +239,8 @@ const ResetPasswordConfirmation = () => {
                                 Reset Password
                             </button>
                         </div>
-                        <p className="text-center mt-2 text-sm text-blue-500 hover:text-blue-700 hover:cursor-pointer" onClick={() => navigate("/login")}>Back to Login</p>
+                        <p className="text-center mt-2 text-sm text-blue-500 hover:text-blue-700 hover:cursor-pointer"
+                           onClick={() => navigate("/")}>Back to Login</p>
                     </form>
                 </div>
             </div>

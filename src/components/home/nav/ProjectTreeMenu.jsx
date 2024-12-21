@@ -74,7 +74,7 @@ const ProjectTreeMenu = ({darkMode, projects, setProjects, activeTab, onSetActiv
                     setProjects={handleProjectUpdate}
                 />
             )}
-            <div className="flex flex-col items-center text-sm font-medium rounded w-full">
+            <div className="flex flex-col items-center text-sm font-medium rounded w-full ">
                 <button
                     onClick={handleProjectsClick}
                     className={`flex items-center px-3 py-2 text-sm font-medium rounded w-full transition-colors duration-200 ${

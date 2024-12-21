@@ -5,9 +5,11 @@ import {useNavigate} from "react-router-dom";
 import {FaGithub, FaGoogle} from "react-icons/fa";
 import Loading from "../helper/Loading.jsx";
 import NotificationManager from "../helper/NotificationManager.jsx";
+import {useAuth} from "../../main.jsx";
 
 const LoginForm = () => {
     const navigate = useNavigate();
+    const {login} = useAuth();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
@@ -47,8 +49,7 @@ const LoginForm = () => {
                     formData
                 );
                 console.log("Login successful:", response.data);
-                localStorage.setItem("access", response.data.access);
-                localStorage.setItem("refresh", response.data.refresh);
+                login(response.data.access, response.data.refresh);
 
                 NotificationManager.showNotification(
                     "Login successfully",
@@ -128,9 +129,23 @@ const LoginForm = () => {
                 console.log("Login successful:", loginResponse.data);
                 localStorage.setItem("access", loginResponse.data.access);
                 localStorage.setItem("refresh", loginResponse.data.refresh);
-                navigate("/home");
+
+                NotificationManager.showNotification(
+                    "Login successfully",
+                    `Hello ${loginResponse.data.user.full_name}`,
+                    "success"
+                )
+
+                setTimeout(() => {
+                    navigate("/home");
+                }, 0);
             } catch (error) {
                 console.error("Error during login process:", error);
+                NotificationManager.showNotification(
+                    "Login failed",
+                    "Failed to login with Google",
+                    "danger"
+                );
             } finally {
                 setLoading(false);
             }

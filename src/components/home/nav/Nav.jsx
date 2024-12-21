@@ -38,7 +38,7 @@ const Nav = ({darkMode, onSetDarkMode, activeTab, onSetActiveTab, username, setS
         <div className="relative">
             {loading && <Loading/>}
             <nav
-                className={`${darkMode ? "bg-gray-800" : "bg-white"} shadow-lg w-64 min-h-screen transition-colors duration-200`}>
+                className={`${darkMode ? "bg-gray-800" : "bg-white"} sticky top-0 shadow-lg w-64 min-h-screen transition-colors duration-200`}>
                 <div className="py-4">
                     <div className="px-4 mb-6">
                         <div className="flex items-center">

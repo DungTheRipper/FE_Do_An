@@ -16,7 +16,26 @@ const AuthContext = createContext(null);
 
 const AuthProvider = ({children}) => {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('access'));
-    const authProviderValue = {isAuthenticated, setIsAuthenticated};
+
+    const login = (access, refresh) => {
+        localStorage.setItem("access", access);
+        localStorage.setItem("refresh", refresh);
+        setIsAuthenticated(true);
+    };
+
+    const logout = () => {
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        localStorage.removeItem("activeTab");
+        setIsAuthenticated(false);
+    };
+
+    const authProviderValue = {
+        isAuthenticated,
+        setIsAuthenticated,
+        login,
+        logout,
+    };
 
     return (
         <AuthContext.Provider value={authProviderValue}>
@@ -43,7 +62,7 @@ createRoot(document.getElementById('root')).render(
             <Routes>
                 <Route path="/" element={<AuthScreen/>}/>
                 <Route path="/login/callback" element={<Callback/>}/>
-                <Route path="/reset-confirmation" element={<ResetPasswordConfirmation/>}/>
+                <Route path="/reset-confirmation/:uidb64/:token" element={<ResetPasswordConfirmation/>}/>
                 <Route
                     path="/home"
                     element={<PrivateRoute><App/></PrivateRoute>}

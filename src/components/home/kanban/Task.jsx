@@ -36,7 +36,7 @@ const Task = ({darkMode, task, index, onTaskUpdated}) => {
                         ${snapshot.isDragging && "bg-blue-300 text-gray-100"}
                         ${
                             isOverdue
-                                ? "border-2 border-red-600 bg-red-200"
+                                ? (darkMode ? "border-2 border-red-600 bg-red-500" : "border-2 border-red-600 bg-red-200")
                                 : darkMode
                                     ? "text-gray-100 bg-gray-600"
                                     : "text-gray-600 bg-gray-100"
@@ -68,7 +68,7 @@ const Task = ({darkMode, task, index, onTaskUpdated}) => {
                             className={"text-start w-1/12 h-1/12"}
                         />
                         {isOverdue && (
-                            <p className="text-red-600 font-bold text-xs">⚠️ Overdue</p>
+                            <p className={`${darkMode ? "text-red-900" : "text-red-600"} font-bold text-xs`}>⚠️ Overdue</p>
                         )}
                         {provided.placeholder}
                     </div>
